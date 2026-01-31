@@ -41,6 +41,10 @@ npm run start
 
 - `NEXT_PUBLIC_SITE_URL` - Set to your deployment URL (e.g., `https://your-app.vercel.app`) for correct canonical URLs, sitemap, and Open Graph metadata.
 
+### Data Source
+
+- Fetches exactly 10 posts from Sling Academy API (`offset=0&limit=10`). No pagination per requirements.
+
 ## Features
 
 - **Home Page**: Header, Hero section, Article grid (10 posts), Footer
@@ -99,15 +103,17 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 
 ### Performance Optimizations
 
-- Server-side data fetching with ISR (`revalidate: 3600`)
+- Client-side fetch via `/api/blog-posts` route (avoids CORS/522 on Vercel)
+- API route: direct fetch first, then allorigins.win proxy fallback if direct fails; 6s timeout per attempt. When both fail, returns 502 with a clear error message; UI shows Retry button
 - Debounced search (300ms) to reduce re-renders
+- Image lazy loading and skeleton placeholders
 - Static generation for metadata, robots.txt, sitemap
 
 ## Search and Filter Implementation
 
-- **Search**: Client-side filtering across `title`, `description`, and `content_text` (case-insensitive). Debounced by 300ms.
-- **Category Filter**: Unique categories derived from fetched articles. "All" plus per-category pills.
-- **Combined**: Search and category filters apply together. Results count displayed; "No results" message when empty.
+- **Search**: Client-side filtering across `title`, `description`, and `content_text` (as required). Case-insensitive match in any of the three fields. Debounced by 300ms.
+- **Category Filter**: Unique categories derived from fetched articles (no hardcoded list). "All" plus per-category pills with active state styling.
+- **Combined**: Search and category filters apply together. Results count ("Showing X of Y articles") displayed; "No results" message when empty.
 
 ## Structured Data (JSON-LD)
 
@@ -122,7 +128,8 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 
 ## Challenges Faced
 
-- **API Integration**: Handled network errors and invalid responses with try/catch and user-friendly error UI
+- **API Integration**: Handled network errors and invalid responses with try/catch and user-friendly error UI with Retry button
+- **Vercel Deployment (522 / Failed to fetch)**: Sling Academy API returned 522 (connection timeout) when fetched from Vercel's server, and CORS blocked direct browser fetch from vercel.app. **Solution**: Created Next.js API route (`/api/blog-posts`) as proxy. Client fetches from same origin. API route tries direct fetch first, falls back to allorigins.win proxy if direct fails. Ensures data loads on Vercel.
 - **Modal Focus Trap**: Implemented keyboard focus trapping and return-focus-on-close for accessibility
 - **Search Debouncing**: Balanced responsiveness with performance using 300ms debounce
 

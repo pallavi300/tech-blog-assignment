@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface SearchBarProps {
   value: string;
@@ -16,21 +16,27 @@ export default function SearchBar({
   placeholder = "Search articles by title, description, or content...",
 }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value);
-
-  const debouncedOnChange = useCallback(
-    (newValue: string) => {
-      const timer = setTimeout(() => {
-        onChange(newValue);
-      }, DEBOUNCE_MS);
-      return () => clearTimeout(timer);
-    },
-    [onChange]
-  );
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    const cleanup = debouncedOnChange(localValue);
-    return cleanup;
-  }, [localValue, debouncedOnChange]);
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null;
+      if (mountedRef.current) onChange(localValue);
+    }, DEBOUNCE_MS);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [localValue, onChange]);
 
   useEffect(() => {
     setLocalValue(value);

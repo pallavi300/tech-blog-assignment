@@ -63,7 +63,7 @@ export default function BlogClient() {
           </h2>
           <p className="mt-2 text-red-700">{error}</p>
           <p className="mt-4 text-sm text-red-600">
-            Please check your connection and try again later.
+            The article source may be down or slow. Tap Retry to try again.
           </p>
           <button
             type="button"

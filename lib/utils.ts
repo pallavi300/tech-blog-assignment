@@ -13,7 +13,8 @@ export function formatDate(dateString: string): string {
 }
 
 /**
- * Filter blogs by search query (title, description, or content_text)
+ * Search across title, description, AND content_text (document requirement).
+ * Matches if query appears in any of these fields.
  */
 export function filterBySearch(blogs: BlogPost[], query: string): BlogPost[] {
   if (!query.trim()) return blogs;
@@ -40,7 +41,8 @@ export function filterByCategory(
 }
 
 /**
- * Get unique categories from blog posts
+ * Get unique categories from fetched articles (document: category filter
+ * shows all unique categories from the data).
  */
 export function getUniqueCategories(blogs: BlogPost[]): string[] {
   const categories = blogs
