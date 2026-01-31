@@ -5,7 +5,7 @@ A fast, SEO-optimized tech blog built with Next.js, TypeScript, and Tailwind CSS
 ## Live Demo
 
 - **Live URL**: [Deploy on Vercel to get your URL]
-- **GitHub Repository**: [Add your repository URL]
+- **GitHub Repository**: [https://github.com/pallavi300/tech-blog-assignment](https://github.com/pallavi300/tech-blog-assignment)
 
 ## Technologies Used
 

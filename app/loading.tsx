@@ -6,7 +6,7 @@ export default function Loading() {
   return (
     <div className="flex min-h-screen flex-col bg-zinc-50">
       <Header />
-      <main>
+      <main id="main-content">
         <Hero />
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center gap-4">
