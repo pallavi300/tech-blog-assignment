@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { BlogPost } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
@@ -13,9 +13,11 @@ interface ArticleModalProps {
 export default function ArticleModal({ post, onClose }: ArticleModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     if (post) {
+      setImageLoaded(false);
       previousActiveElement.current = document.activeElement as HTMLElement | null;
     } else if (previousActiveElement.current) {
       previousActiveElement.current.focus();
@@ -120,13 +122,22 @@ export default function ArticleModal({ post, onClose }: ArticleModalProps) {
 
         <article className="p-6 pb-8">
           <div className="relative mb-6 aspect-video w-full overflow-hidden rounded-lg bg-zinc-100">
+            {!imageLoaded && (
+              <div
+                className="absolute inset-0 animate-pulse bg-zinc-200"
+                aria-hidden
+              />
+            )}
             <Image
               src={post.photo_url}
               alt={`Cover image for: ${post.title}`}
               fill
               sizes="(max-width: 768px) 100vw, 672px"
-              className="object-cover"
+              className={`object-cover transition-opacity duration-300 ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
               priority
+              onLoad={() => setImageLoaded(true)}
             />
           </div>
 
