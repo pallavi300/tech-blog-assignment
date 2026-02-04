@@ -1,6 +1,6 @@
 /**
  * Blog post shape used across the app.
- * API: https://dummyjson.com/posts (mapped to this shape in /api/blog-posts).
+ * API: https://dummyjson.com/posts (mapped to this shape in client).
  */
 
 export interface BlogPost {

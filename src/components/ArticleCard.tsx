@@ -1,7 +1,4 @@
-"use client";
-
 import { useState } from "react";
-import Image from "next/image";
 import type { BlogPost } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -36,12 +33,10 @@ export default function ArticleCard({ post, onSelect }: ArticleCardProps) {
             aria-hidden
           />
         )}
-        <Image
+        <img
           src={post.photo_url}
           alt={`Cover image for: ${post.title}`}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className={`object-cover transition-opacity duration-300 group-hover:scale-105 ${
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 group-hover:scale-105 ${
             imageLoaded ? "opacity-100" : "opacity-0"
           }`}
           loading="lazy"

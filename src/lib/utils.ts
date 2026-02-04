@@ -1,8 +1,5 @@
 import type { BlogPost } from "./types";
 
-/**
- * Format date string to "Jan 15, 2024" format
- */
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return new Intl.DateTimeFormat("en-US", {
@@ -12,10 +9,6 @@ export function formatDate(dateString: string): string {
   }).format(date);
 }
 
-/**
- * Search across title, description, AND content_text (document requirement).
- * Matches if query appears in any of these fields.
- */
 export function filterBySearch(blogs: BlogPost[], query: string): BlogPost[] {
   if (!query.trim()) return blogs;
   const lowerQuery = query.toLowerCase().trim();
@@ -27,9 +20,6 @@ export function filterBySearch(blogs: BlogPost[], query: string): BlogPost[] {
   );
 }
 
-/**
- * Filter blogs by category
- */
 export function filterByCategory(
   blogs: BlogPost[],
   category: string | null
@@ -40,10 +30,6 @@ export function filterByCategory(
   );
 }
 
-/**
- * Get unique categories from fetched articles (document: category filter
- * shows all unique categories from the data).
- */
 export function getUniqueCategories(blogs: BlogPost[]): string[] {
   const categories = blogs
     .map((blog) => blog.category)

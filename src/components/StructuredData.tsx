@@ -1,7 +1,6 @@
 import type { BlogPost } from "@/lib/types";
 
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://tech-blog.vercel.app";
+const SITE_URL = import.meta.env.VITE_SITE_URL || (typeof window !== "undefined" ? window.location.origin : "https://tech-blog.vercel.app");
 
 export function WebSiteSchema() {
   const schema = {

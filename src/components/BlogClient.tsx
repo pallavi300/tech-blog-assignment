@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState, useMemo } from "react";
-import { fetchBlogPostsClient } from "@/lib/api";
+import { fetchBlogPosts } from "@/lib/api";
 import type { BlogPost } from "@/lib/types";
 import {
   filterBySearch,
@@ -23,11 +21,11 @@ export default function BlogClient() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
 
-  const fetchPosts = async () => {
+  const loadPosts = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchBlogPostsClient();
+      const data = await fetchBlogPosts();
       setPosts(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load blog posts");
@@ -37,7 +35,7 @@ export default function BlogClient() {
   };
 
   useEffect(() => {
-    fetchPosts();
+    loadPosts();
   }, []);
 
   const filteredPosts = useMemo(() => {
@@ -67,7 +65,7 @@ export default function BlogClient() {
           </p>
           <button
             type="button"
-            onClick={fetchPosts}
+            onClick={loadPosts}
             className="mt-6 inline-block rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2"
           >
             Retry

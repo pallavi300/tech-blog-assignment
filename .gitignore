@@ -13,11 +13,8 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-
-# production
+# build
+/dist
 /build
 
 # misc
@@ -38,4 +35,4 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+vite.config.ts.timestamp-*

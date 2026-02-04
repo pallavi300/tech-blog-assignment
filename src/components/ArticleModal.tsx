@@ -1,7 +1,4 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import type { BlogPost } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
 
@@ -128,15 +125,12 @@ export default function ArticleModal({ post, onClose }: ArticleModalProps) {
                 aria-hidden
               />
             )}
-            <Image
+            <img
               src={post.photo_url}
               alt={`Cover image for: ${post.title}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 672px"
-              className={`object-cover transition-opacity duration-300 ${
+              className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
-              priority
               onLoad={() => setImageLoaded(true)}
             />
           </div>

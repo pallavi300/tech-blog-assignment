@@ -1,18 +1,20 @@
 # Tech Blog
 
-A fast, SEO-optimized tech blog built with Next.js, TypeScript, and Tailwind CSS. Displays 10 articles from the [DummyJSON Posts API](https://dummyjson.com/posts) with search, category filtering, and article modals.
+A fast, SEO-optimized tech blog built with **React**, **Vite**, **TypeScript**, and **Tailwind CSS**. Displays 10 articles from the [DummyJSON Posts API](https://dummyjson.com/posts) with search, category filtering, and article modals.
 
 ## Live Demo
 
-- **Live URL**: [Deploy on Vercel to get your URL]
+- **Live URL**: [Deploy on Vercel/Netlify to get your URL]
 - **GitHub Repository**: [https://github.com/pallavi300/tech-blog-assignment](https://github.com/pallavi300/tech-blog-assignment)
 
 ## Technologies Used
 
-- **Next.js 16** (App Router)
+- **React 18**
+- **Vite** (build tool)
 - **TypeScript**
-- **Tailwind CSS**
-- **Vercel** (deployment)
+- **Tailwind CSS 4**
+- **react-helmet-async** (meta tags for SEO)
+- **Vercel / Netlify** (deployment)
 
 ## Getting Started
 
@@ -28,22 +30,24 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Production Build
 
 ```bash
 npm run build
-npm run start
+npm run preview
 ```
+
+Preview serves the built app from `dist/` (e.g. at http://localhost:4173).
 
 ### Environment Variables (Optional)
 
-- `NEXT_PUBLIC_SITE_URL` - Set to your deployment URL (e.g., `https://your-app.vercel.app`) for correct canonical URLs, sitemap, and Open Graph metadata.
+- `VITE_SITE_URL` - Set to your deployment URL (e.g. `https://your-app.vercel.app`) for canonical URLs and JSON-LD.
 
 ### Data Source
 
-- Fetches exactly 10 posts from [DummyJSON Posts API](https://dummyjson.com/posts) (`?limit=10`). Response is mapped to the app’s `BlogPost` shape (category from first tag, placeholder images from Picsum). No pagination per requirements.
+- Fetches 10 posts from [DummyJSON Posts API](https://dummyjson.com/posts) (`?limit=10`) **from the browser**. Response is mapped to the app’s `BlogPost` shape (category from first tag, placeholder images from Picsum). No pagination per requirements.
 
 ## Features
 
@@ -77,7 +81,7 @@ npm run start
 
 ---
 
-To generate these screenshots: Run `npm run build && npm run start`, then use Chrome DevTools Lighthouse tab or `npx lighthouse http://localhost:3000 --view` to capture each category and save to the `screenshots/` directory.
+To generate these screenshots: Run `npm run build && npm run preview`, then use Chrome DevTools Lighthouse tab or `npx lighthouse http://localhost:4173 --view` to capture each category and save to the `screenshots/` directory.
 
 ## SEO Strategy
 
@@ -85,8 +89,9 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 
 - **Page Title** (≤60 chars): "Tech Blog | Tech Insights & Stories" for clear branding
 - **Meta Description** (≤160 chars): Descriptive summary for search snippets
-- **Open Graph**: `og:title`, `og:description`, `og:image` for social sharing
-- **Twitter Card**: `summary_large_image` with title, description, and image
+- **Open Graph**: `og:title`, `og:description`, `og:url` for social sharing
+- **Twitter Card**: `summary_large_image` with title and description
+- **react-helmet-async** used to set title and meta tags in the document head
 
 ### Semantic HTML
 
@@ -96,18 +101,16 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 
 ### Image Optimization
 
-- Next.js `Image` component for all images with responsive `sizes`
-- Descriptive `alt` text (e.g., "Cover image for: {title}")
-- Lazy loading enabled for below-fold images
-- Remote images from `picsum.photos` (placeholder per post) configured in `next.config.ts`
+- Native `<img>` with `loading="lazy"` for below-fold images
+- Descriptive `alt` text (e.g. "Cover image for: {title}")
+- Placeholder images from Picsum (no extra config needed for client-side)
 
 ### Performance Optimizations
 
-- Client-side fetch via `/api/blog-posts` route (avoids CORS)
-- API route fetches from [DummyJSON Posts API](https://dummyjson.com/posts?limit=10) with timeout; maps response to `BlogPost`; on failure returns 502 with clear error; UI shows Retry button
+- Client-side fetch from [DummyJSON Posts API](https://dummyjson.com/posts?limit=10) (CORS allowed by DummyJSON)
+- Response mapped to `BlogPost` in the client; error handling with Retry button
 - Debounced search (300ms) to reduce re-renders
 - Image lazy loading and skeleton placeholders
-- Static generation for metadata, robots.txt, sitemap
 
 ## Search and Filter Implementation
 
@@ -120,18 +123,12 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 - **WebSite schema** on homepage for site-level search visibility
 - **Article schema** for each blog post (headline, description, image, dates, author)
 
-## Technical SEO
-
-- `robots.txt`: Allow all crawlers, reference sitemap
-- `sitemap.xml`: Homepage URL with lastModified and changeFrequency
-- Proper URL structure (clean routes)
-
 ## Challenges Faced
 
 - **API Integration**: Handled network errors and invalid responses with try/catch and user-friendly error UI with Retry button
-- **API integration**: Using [DummyJSON Posts API](https://dummyjson.com/posts) for blog data. Next.js API route (`/api/blog-posts`) fetches server-side and maps response to app’s `BlogPost` shape; client fetches from same origin to avoid CORS.
+- **API integration**: Using [DummyJSON Posts API](https://dummyjson.com/posts) for blog data. Client fetches directly (CORS allowed); response mapped to app’s `BlogPost` shape in the browser.
 - **Modal Focus Trap**: Implemented keyboard focus trapping and return-focus-on-close for accessibility
-- **Search Debouncing**: Balanced responsiveness with performance using 300ms debounce
+- **Search Debouncing**: Balanced responsiveness and performance using 300ms debounce with cleanup on unmount
 
 ## License
 

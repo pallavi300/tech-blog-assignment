@@ -1,5 +1,3 @@
-"use client";
-
 interface CategoryFilterProps {
   categories: string[];
   activeCategory: string | null;
