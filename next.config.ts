@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "api.slingacademy.com",
+        hostname: "picsum.photos",
         pathname: "/**",
       },
     ],

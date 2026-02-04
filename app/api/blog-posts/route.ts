@@ -1,22 +1,14 @@
 import { NextResponse } from "next/server";
-import type { ApiResponse } from "@/lib/types";
+import type { BlogPost } from "@/lib/types";
+import {
+  type DummyJsonResponse,
+  mapDummyPostToBlogPost,
+} from "@/lib/dummyjson";
 
-// Document: https://api.slingacademy.com/v1/sample-data/blog-posts?offset=0&limit=10
-const API_URL =
-  "https://api.slingacademy.com/v1/sample-data/blog-posts?offset=0&limit=10";
-const PROXY_URL = `https://api.allorigins.win/raw?url=${encodeURIComponent(API_URL)}`;
-const TIMEOUT_MS = 6000; // 6s each — fail fast so Network tab shows response (502) within ~12s
+// https://dummyjson.com/posts
+const API_URL = "https://dummyjson.com/posts?limit=10";
+const TIMEOUT_MS = 8000;
 const BLOG_LIMIT = 10;
-
-function parseAndValidate(data: ApiResponse): NextResponse {
-  if (!data.success || !Array.isArray(data.blogs)) {
-    return NextResponse.json(
-      { error: data.message || "Invalid response" },
-      { status: 502 }
-    );
-  }
-  return NextResponse.json(data.blogs.slice(0, BLOG_LIMIT));
-}
 
 async function fetchWithTimeout(
   url: string,
@@ -30,53 +22,52 @@ async function fetchWithTimeout(
 }
 
 export async function GET() {
-  const tryFetch = async (url: string): Promise<Response | null> => {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
-    try {
-      const res = await fetchWithTimeout(url, controller.signal);
-      clearTimeout(timeoutId);
-      return res;
-    } catch {
-      clearTimeout(timeoutId);
-      return null;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+  try {
+    const response = await fetchWithTimeout(API_URL, controller.signal);
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: "Failed to fetch blog posts." },
+        { status: response.status }
+      );
     }
-  };
 
-  // 1. Try direct fetch first
-  let response = await tryFetch(API_URL);
+    let data: DummyJsonResponse;
+    try {
+      data = (await response.json()) as DummyJsonResponse;
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid response from source." },
+        { status: 502 }
+      );
+    }
 
-  // 2. If direct failed or non-ok, try proxy (fixes 502 when Sling Academy is down/slow)
-  if (!response || !response.ok) {
-    response = await tryFetch(PROXY_URL);
-  }
+    if (!Array.isArray(data.posts)) {
+      return NextResponse.json(
+        { error: "Invalid response format." },
+        { status: 502 }
+      );
+    }
 
-  if (!response) {
+    const posts: BlogPost[] = data.posts
+      .slice(0, BLOG_LIMIT)
+      .map(mapDummyPostToBlogPost);
+
+    return NextResponse.json(posts);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const isTimeout = err instanceof Error && err.name === "AbortError";
     return NextResponse.json(
       {
-        error:
-          "The article source is temporarily unavailable. Check your internet and tap Retry.",
+        error: isTimeout
+          ? "Request timed out. Please try again."
+          : "Failed to fetch blog posts. Please try again later.",
       },
       { status: 502 }
     );
   }
-
-  if (!response.ok) {
-    return NextResponse.json(
-      { error: "Failed to fetch blog posts." },
-      { status: response.status }
-    );
-  }
-
-  let data: ApiResponse;
-  try {
-    data = (await response.json()) as ApiResponse;
-  } catch {
-    return NextResponse.json(
-      { error: "Invalid response from source." },
-      { status: 502 }
-    );
-  }
-
-  return parseAndValidate(data);
 }

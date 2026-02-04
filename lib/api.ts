@@ -1,13 +1,13 @@
-import type { ApiResponse, BlogPost } from "./types";
+import type { BlogPost } from "./types";
+import { type DummyJsonResponse, mapDummyPostToBlogPost } from "./dummyjson";
 
-// Document API: https://api.slingacademy.com/v1/sample-data/blog-posts?offset=0&limit=10
-const API_URL =
-  "https://api.slingacademy.com/v1/sample-data/blog-posts?offset=0&limit=10";
+// API route /api/blog-posts fetches from https://dummyjson.com/posts?limit=10
+const API_URL = "https://dummyjson.com/posts?limit=10";
 const BLOG_LIMIT = 10;
 
 /**
  * Client-side fetch (from browser). Uses /api/blog-posts route to avoid CORS.
- * Our API route fetches from Sling Academy server-side (no CORS issue there).
+ * Our API route fetches from DummyJSON server-side (no CORS issue there).
  */
 export async function fetchBlogPostsClient(): Promise<BlogPost[]> {
   try {
@@ -40,8 +40,8 @@ export async function fetchBlogPostsClient(): Promise<BlogPost[]> {
 }
 
 /**
- * Server-side fetch (from Next.js server). Uses ApiResponse type; returns
- * at most 10 posts per document requirement.
+ * Server-side fetch (from Next.js server). Fetches from DummyJSON and maps
+ * to BlogPost[]; returns at most 10 posts. Prefer using /api/blog-posts from client.
  */
 export async function fetchBlogPosts(): Promise<BlogPost[]> {
   try {
@@ -53,13 +53,12 @@ export async function fetchBlogPosts(): Promise<BlogPost[]> {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
     }
 
-    const data: ApiResponse = await response.json();
-
-    if (!data.success || !Array.isArray(data.blogs)) {
-      throw new Error(data.message || "Failed to fetch blog posts");
+    const data = (await response.json()) as DummyJsonResponse;
+    if (!Array.isArray(data?.posts)) {
+      throw new Error("Invalid response format");
     }
 
-    return data.blogs.slice(0, BLOG_LIMIT);
+    return data.posts.slice(0, BLOG_LIMIT).map(mapDummyPostToBlogPost);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Failed to fetch blog posts: ${error.message}`);

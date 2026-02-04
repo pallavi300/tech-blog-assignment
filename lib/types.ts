@@ -1,6 +1,6 @@
 /**
- * API Integration (document spec):
- * Fetch from: https://api.slingacademy.com/v1/sample-data/blog-posts?offset=0&limit=10
+ * Blog post shape used across the app.
+ * API: https://dummyjson.com/posts (mapped to this shape in /api/blog-posts).
  */
 
 export interface BlogPost {

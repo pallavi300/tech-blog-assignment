@@ -1,6 +1,6 @@
 # Tech Blog
 
-A fast, SEO-optimized tech blog built with Next.js, TypeScript, and Tailwind CSS. Displays 10 articles from the Sling Academy API with search, category filtering, and article modals.
+A fast, SEO-optimized tech blog built with Next.js, TypeScript, and Tailwind CSS. Displays 10 articles from the [DummyJSON Posts API](https://dummyjson.com/posts) with search, category filtering, and article modals.
 
 ## Live Demo
 
@@ -43,7 +43,7 @@ npm run start
 
 ### Data Source
 
-- Fetches exactly 10 posts from Sling Academy API (`offset=0&limit=10`). No pagination per requirements.
+- Fetches exactly 10 posts from [DummyJSON Posts API](https://dummyjson.com/posts) (`?limit=10`). Response is mapped to the app’s `BlogPost` shape (category from first tag, placeholder images from Picsum). No pagination per requirements.
 
 ## Features
 
@@ -99,12 +99,12 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 - Next.js `Image` component for all images with responsive `sizes`
 - Descriptive `alt` text (e.g., "Cover image for: {title}")
 - Lazy loading enabled for below-fold images
-- Remote images from `api.slingacademy.com` configured in `next.config.ts`
+- Remote images from `picsum.photos` (placeholder per post) configured in `next.config.ts`
 
 ### Performance Optimizations
 
-- Client-side fetch via `/api/blog-posts` route (avoids CORS/522 on Vercel)
-- API route: direct fetch first, then allorigins.win proxy fallback if direct fails; 6s timeout per attempt. When both fail, returns 502 with a clear error message; UI shows Retry button
+- Client-side fetch via `/api/blog-posts` route (avoids CORS)
+- API route fetches from [DummyJSON Posts API](https://dummyjson.com/posts?limit=10) with timeout; maps response to `BlogPost`; on failure returns 502 with clear error; UI shows Retry button
 - Debounced search (300ms) to reduce re-renders
 - Image lazy loading and skeleton placeholders
 - Static generation for metadata, robots.txt, sitemap
@@ -129,7 +129,7 @@ To generate these screenshots: Run `npm run build && npm run start`, then use Ch
 ## Challenges Faced
 
 - **API Integration**: Handled network errors and invalid responses with try/catch and user-friendly error UI with Retry button
-- **Vercel Deployment (522 / Failed to fetch)**: Sling Academy API returned 522 (connection timeout) when fetched from Vercel's server, and CORS blocked direct browser fetch from vercel.app. **Solution**: Created Next.js API route (`/api/blog-posts`) as proxy. Client fetches from same origin. API route tries direct fetch first, falls back to allorigins.win proxy if direct fails. Ensures data loads on Vercel.
+- **API integration**: Using [DummyJSON Posts API](https://dummyjson.com/posts) for blog data. Next.js API route (`/api/blog-posts`) fetches server-side and maps response to app’s `BlogPost` shape; client fetches from same origin to avoid CORS.
 - **Modal Focus Trap**: Implemented keyboard focus trapping and return-focus-on-close for accessibility
 - **Search Debouncing**: Balanced responsiveness with performance using 300ms debounce
 
